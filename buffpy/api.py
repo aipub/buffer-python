@@ -9,6 +9,9 @@ PATHS = {
   'INFO': 'info/configuration.json'
 }
 
+class BufferException(Exception):
+    pass
+
 class API(object):
   '''
     Small and clean class that embrace all basic

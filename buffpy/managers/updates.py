@@ -1,4 +1,5 @@
 from buffpy.models.update import Update
+from buffpy.api import BufferException
 
 PATHS = {
   'GET_PENDING': 'profiles/%s/updates/pending.json',
@@ -128,8 +129,14 @@ class Updates(list):
         post_data += media_format % (media_type, media_item)
 
     response = self.api.post(url=url, data=post_data)
-    new_update = Update(api=self.api, raw_response=response['updates'][0])
-
-    self.append(new_update)
-
-    return new_update
+    
+    #error handling
+    success = response.get('success',False)
+    if success and 'updates' in response:
+        new_update = Update(api=self.api, raw_response=response['updates'][0])
+        self.append(new_update)
+        return new_update
+    elif 'message' in response:
+        raise BufferException(response['message'])
+    else:
+        raise BufferException("Unknown Error")
