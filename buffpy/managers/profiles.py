@@ -1,4 +1,5 @@
 from buffpy.models.profile import PATHS, Profile
+from buffpy.exceptions import BufferException
 
 class Profiles(list):
   '''
@@ -15,9 +16,13 @@ class Profiles(list):
   def all(self):
     '''
       Get all social newtworks profiles
+
+      Handle 401 appropriately
     '''
 
     response = self.api.get(url=PATHS['GET_PROFILES'])
+    if 'error' in response and 'code' in response:
+      raise BufferException(response)
 
     for raw_profile in response:
       self.append(Profile(self.api, raw_profile))
